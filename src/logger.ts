@@ -1,5 +1,6 @@
 import * as express from 'express';
 import { TelemetryClient } from 'applicationinsights';
+import { RequestTelemetry } from 'applicationinsights/out/Declarations/Contracts';
 
 export class Logger {
   constructor(private ai: TelemetryClient) {
@@ -34,7 +35,12 @@ export class Logger {
     this.ai.trackMetric({ name, value });
   }
 
-  trackRequest(req: express.Request, res: express.Response, properties?: { [key: string]: string }) {
+  trackRequest(
+    req: express.Request,
+    res: express.Response,
+    properties?: { [key: string]: string },
+    telemetryProperties?: Partial<RequestTelemetry>,
+  ) {
     this.ai.trackRequest({
       name: `${req.method} ${req.path}`,
       url: req.url,
@@ -43,6 +49,7 @@ export class Logger {
       resultCode: (res.statusCode || 200).toString(),
       success: true,
       properties,
+      ...telemetryProperties,
     });
   }
 }

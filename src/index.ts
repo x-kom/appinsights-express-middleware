@@ -2,6 +2,7 @@ import * as appInsights from 'applicationinsights';
 import * as express from 'express';
 import * as uuid from 'uuid';
 import { Logger } from './logger';
+import { RequestTelemetry } from 'applicationinsights/out/Declarations/Contracts';
 
 export interface AppInsightsExpressOptions {
   key?: string;
@@ -33,8 +34,13 @@ export const logger = (app: express.Application, options?: AppInsightsExpressOpt
   };
 };
 
-export const logRequest = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  res.locals.logger.trackRequest(req, res, { requestId: res.locals.requestId });
+export const logRequest = (
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+  telemetryProperties?: Partial<RequestTelemetry>,
+) => {
+  res.locals.logger.trackRequest(req, res, { requestId: res.locals.requestId }, telemetryProperties);
   next();
 };
 
